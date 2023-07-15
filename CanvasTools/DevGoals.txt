@@ -1,0 +1,10 @@
+﻿Development Goals for Canvas Tools:
+
+Bugs:
+Spacer - Button doesn't show as depressed
+Spacer - Component doesn't evaluate when selected, only when inputs are changed or Up/Down is toggled
+
+Additions:
+Modify Name by Group - Add Component
+Modify Wires by Group - Add Component
+Develop Scale-by-Group functionality
