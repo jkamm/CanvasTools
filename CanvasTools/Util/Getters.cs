@@ -130,9 +130,66 @@ namespace CanvasTools.Util
                           pivotXRef - (float)(maxTier - tier) * (float)xSpacing;
                     }
 
+                    positionX = xSpacing == 0 ? (float)obj.Attributes.Pivot.X : positionX;
+                    positionY = ySpacing == 0 ? (float)obj.Attributes.Pivot.Y : positionY;
+
                     pivotDictionary.Add(obj, new PointF(positionX, positionY));
                     index++;
                 }
+            }
+            return pivotDictionary;
+        }
+
+        static public Dictionary<GH_DocumentObject, PointF> GetScalingPivots(Dictionary<GH_DocumentObject, int> dictionary, double xScaling, double yScaling)
+        {
+            Dictionary<GH_DocumentObject, PointF> pivotDictionary = new Dictionary<GH_DocumentObject, PointF>();
+
+            bool positiveY = yScaling > 0;
+            bool positiveX = xScaling > 0;
+
+            //positiveX = reversed ? !positiveX : positiveX;
+
+            float pivotYRef = positiveY ?
+              dictionary.Keys.Min(key => key.Attributes.Pivot.Y) :
+              dictionary.Keys.Max(key => key.Attributes.Pivot.Y);
+
+            float pivotXRef = positiveX ?
+              dictionary.Keys.Min(key => key.Attributes.Pivot.X) :
+              dictionary.Keys.Max(key => key.Attributes.Pivot.X);
+
+            //positiveX = reversed ? !positiveX : positiveX;
+
+            int maxTier = dictionary.Values.Max();
+
+            //Get unique values in dictionary
+            List<int> columns = dictionary.Values.Distinct().ToList();
+
+            //Iterate over unique values in the Dictionary
+            foreach (int val in columns)
+            {
+                List<GH_DocumentObject> columnObjects = dictionary.Where(kvp => kvp.Value.Equals(val))
+                  .Select(kvp => kvp.Key)
+                  .ToList();
+                //columnObjects.Sort((obj1, obj2) => obj1.Attributes.Pivot.Y.CompareTo(obj2.Attributes.Pivot.Y));
+                //if (!positiveY)
+                //    columnObjects.Reverse();
+
+                //int index = 0;
+                foreach (GH_DocumentObject obj in columnObjects)
+                {
+                    float positionY = positiveY?
+                        (obj.Attributes.Pivot.Y - pivotYRef) * (float)yScaling + pivotYRef:
+                        (pivotYRef - obj.Attributes.Pivot.Y) * (float)yScaling + pivotYRef;
+
+                    float positionX = positiveX ?
+                      (float)xScaling * (obj.Attributes.Pivot.X - pivotXRef) + pivotXRef:
+                      (float)xScaling * (pivotXRef - obj.Attributes.Pivot.X) + pivotXRef;
+
+                    positionX = xScaling == 0 ? (float)obj.Attributes.Pivot.X : positionX;
+                    positionY = yScaling == 0 ? (float)obj.Attributes.Pivot.Y : positionY;
+
+                    pivotDictionary.Add(obj, new PointF(positionX, positionY));
+                    }
             }
             return pivotDictionary;
         }

@@ -11,7 +11,7 @@ using CanvasTools.Util;
 
 namespace CanvasTools.Components
 {
-    public class CanvasToolsComponent : Base.ButtonComponent
+    public class Spacer : Base.ButtonComponent
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -20,7 +20,7 @@ namespace CanvasTools.Components
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public CanvasToolsComponent()
+        public Spacer()
           : base("Spacer", "Spacer",
             "Arranges grasshopper elements into rows and columns according to connections",
             "Extra", "CanvasTools")
@@ -41,8 +41,8 @@ namespace CanvasTools.Components
         protected override void RegisterInputParams(GH_InputParamManager pManager)
         {
             pManager.AddBooleanParameter("Get Selected", "Get", "Get Canvas Selection", GH_ParamAccess.item);
-            pManager.AddNumberParameter("xSpacing", "X", "Spacing between pivots in X direction", GH_ParamAccess.item, 200);
-            pManager.AddNumberParameter("ySpacing", "Y", "Spacing between pivots in Y direction", GH_ParamAccess.item, 100);
+            pManager.AddNumberParameter("xSpacing", "X", "Spacing between pivots in X direction \nDefault (0) leaves X spacing unchanged", GH_ParamAccess.item, 0);
+            pManager.AddNumberParameter("ySpacing", "Y", "Spacing between pivots in Y direction \nDefault (0) leaves Y spacing unchanged", GH_ParamAccess.item, 0);
             //pManager.AddBooleanParameter("Flow", "F", "Left to Right = false, Right to Left = true", GH_ParamAccess.item, false);
 
             pManager[0].Optional = true;
@@ -65,8 +65,8 @@ namespace CanvasTools.Components
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            double xSpacing = 200;
-            double ySpacing = 100;
+            double xSpacing = 0;
+            double ySpacing = 0;
            // bool flowUp = false;
             bool getSelected = false;
 
@@ -75,8 +75,8 @@ namespace CanvasTools.Components
             DA.GetData(2, ref ySpacing);
             //DA.GetData(3, ref flowUp);
 
-            xSpacing = Math.Abs(xSpacing) < 1 ? 1 : xSpacing;
-            ySpacing = Math.Abs(ySpacing) < 1 ? 1 : ySpacing;
+            //xSpacing = Math.Abs(xSpacing) < 1 ? 1 : xSpacing;
+            //ySpacing = Math.Abs(ySpacing) < 1 ? 1 : ySpacing;
 
             if (getSelected || Execute)
             {
