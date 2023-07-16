@@ -19,6 +19,8 @@ namespace CanvasTools.Components
               "Changes the Icon/Name Display mode on incoming and outgoing parameters on selected Groups",
               "Extra", "CanvasTools")
         {
+            Message = "name";
+
         }
         public override GH_Exposure Exposure => GH_Exposure.secondary;
 
@@ -102,7 +104,7 @@ namespace CanvasTools.Components
 
         #region Record and Display WireState
         //implemented based on example: https://developer.rhino3d.com/guides/grasshopper/custom-component-options/
-        private int iconState = 1;
+        private int iconState = 2;
 
         public int IconMode
         {

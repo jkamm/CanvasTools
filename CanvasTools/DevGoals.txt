@@ -3,10 +3,10 @@
 Bugs:
 
 Spacer - Component doesn't evaluate when selected, only when inputs are changed or Up/Down is toggled
+Modify Name by Group - Add Icon
+Modify Wires by Group - Add Icon
 
 Additions:
 Spacer - improve icon
 Spacer - change icon by Up/Down state
-Modify Name by Group - Add Component
-Modify Wires by Group - Add Component
 Develop Scale-by-Group functionality

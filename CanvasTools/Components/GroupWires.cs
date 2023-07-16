@@ -14,7 +14,7 @@ namespace CanvasTools.Components
               "Select one or more groups to set the wire state for all wires coming into a group (but not between group members)\nDoes not affect relays",
               "Extra", "CanvasTools")
         {
-            Message = "default";
+            Message = "faint";
         }
 
         public override GH_Exposure Exposure => GH_Exposure.secondary;
