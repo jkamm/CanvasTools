@@ -32,6 +32,25 @@ namespace CanvasTools.Util
             return dictionary;
         }
 
+        static public Dictionary<GH_DocumentObject, int> JustGetSelectedObjects(List<IGH_ActiveObject> activeObjects, List<IGH_DocumentObject> inactiveObjects)
+        {
+            Dictionary<GH_DocumentObject, int> dictionary = new Dictionary<GH_DocumentObject, int>();
+
+            // Get the active document in Grasshopper
+            GH_Document doc = Grasshopper.Instances.ActiveCanvas.Document;
+
+            // Get the selected objects in the document
+            List<IGH_DocumentObject> selObjList = activeObjects.Union(inactiveObjects).ToList();
+            //selObjList.AddRange(activeObjects);
+
+            //initialize dictionary with no tier values
+            dictionary = selObjList.OfType<GH_DocumentObject>()
+              .Where(ghObj => !(ghObj is Grasshopper.Kernel.Special.GH_Group))
+              .ToDictionary(ghObj => ghObj, _ => 0);
+
+            return dictionary;
+        }
+
         static public IGH_DocumentObject GetParentObject(IGH_DocumentObject childObject)
         {
             if (childObject is IGH_Param)

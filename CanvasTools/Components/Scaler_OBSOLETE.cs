@@ -10,19 +10,21 @@ using CanvasTools.Util;
 
 namespace CanvasTools.Components
 {
-    public class Scaler : Base.ButtonComponent
+    public class Scaler_OBSOLETE : Base.ButtonComponent
     {
         /// <summary>
         /// Initializes a new instance of the Scaler class.
         /// </summary>
-        public Scaler()
+        public Scaler_OBSOLETE()
           : base("Canvas Scaler", "Scaler",
               "Scales position of objects on the canvas",
               "Extra", "CanvasTools")
         {
             ButtonName = "Select";
         }
-        
+
+        public override bool Obsolete => true;
+        public override GH_Exposure Exposure => GH_Exposure.hidden;
 
         Dictionary<GH_DocumentObject, int> selectedObjects = new Dictionary<GH_DocumentObject, int>();
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -6,11 +6,12 @@ using Grasshopper;
 using Grasshopper.Kernel;
 using GH_IO.Serialization;
 using CanvasTools.Util;
-using CanvasTools.MetaHopper;
+
+
 
 namespace CanvasTools.Components
 {
-    public class Spacer : MH_SelectButtonComponent
+    public class Spacer_OBSOLETE : Base.ButtonComponent
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -19,17 +20,20 @@ namespace CanvasTools.Components
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public Spacer()
+        public Spacer_OBSOLETE()
           : base("Spacer", "Spacer",
             "Arranges grasshopper elements into rows and columns according to connections",
             "Extra", "CanvasTools")
         {
+            ButtonName = "Select";
             Message = "Up";
         }
 
+        public override bool Obsolete => true;
+        public override GH_Exposure Exposure => GH_Exposure.hidden;
+
 
         Dictionary<GH_DocumentObject, int> selectedObjects = new Dictionary<GH_DocumentObject, int>();
-        
         bool direction = true;
         bool cyclic = false;
 
@@ -38,11 +42,15 @@ namespace CanvasTools.Components
         /// </summary>
         protected override void RegisterInputParams(GH_InputParamManager pManager)
         {
+            pManager.AddBooleanParameter("Get Selected", "Get", "Get Canvas Selection", GH_ParamAccess.item);
             pManager.AddNumberParameter("xSpacing", "X", "Spacing between pivots in X direction \nDefault (0) leaves X spacing unchanged", GH_ParamAccess.item, 0);
             pManager.AddNumberParameter("ySpacing", "Y", "Spacing between pivots in Y direction \nDefault (0) leaves Y spacing unchanged", GH_ParamAccess.item, 0);
+            //pManager.AddBooleanParameter("Flow", "F", "Left to Right = false, Right to Left = true", GH_ParamAccess.item, false);
 
             pManager[0].Optional = true;
             pManager[1].Optional = true;
+            pManager[2].Optional = true;
+            //pManager[3].Optional = true;
         }
 
         /// <summary>
@@ -61,37 +69,48 @@ namespace CanvasTools.Components
         {
             double xSpacing = 0;
             double ySpacing = 0;
-                       
-            DA.GetData(0, ref xSpacing);
-            DA.GetData(1, ref ySpacing);
-                       
-            if (Direction) selectedObjects = TierClimber.ComputeSelectionTiersUp(Getters.JustGetSelectedObjects(ActiveObjects, InactiveObjects));
-            else selectedObjects = TierClimber.ComputeSelectionTiers(Getters.JustGetSelectedObjects(ActiveObjects, InactiveObjects));
-       
-            //recompute tiers if Justify direction changes
-            if (direction != Direction)
+           // bool flowUp = false;
+            bool getSelected = false;
+
+            DA.GetData(0, ref getSelected);
+            DA.GetData(1, ref xSpacing);
+            DA.GetData(2, ref ySpacing);
+            //DA.GetData(3, ref flowUp);
+
+            //xSpacing = Math.Abs(xSpacing) < 1 ? 1 : xSpacing;
+            //ySpacing = Math.Abs(ySpacing) < 1 ? 1 : ySpacing;
+
+            if (getSelected || Execute)
             {
-                direction = Direction;
-                if (Direction) selectedObjects = TierClimber.ComputeSelectionTiersUp(selectedObjects);
-                else selectedObjects = TierClimber.ComputeSelectionTiers(selectedObjects);
+                if (Direction) selectedObjects = TierClimber.ComputeSelectionTiersUp(Getters.JustGetSelectedObjects());
+                else selectedObjects = TierClimber.ComputeSelectionTiers(Getters.JustGetSelectedObjects());
             }
+            else
+            {
+                //recompute tiers if Justify direction changes
+                if (direction != Direction)
+                {
+                    direction = Direction;
+                    if (Direction) selectedObjects = TierClimber.ComputeSelectionTiersUp(selectedObjects);
+                    else selectedObjects = TierClimber.ComputeSelectionTiers(selectedObjects);
+                }
 
                 if (selectedObjects.Keys.Count() > 0)
                 {
                     if (cyclic == true) AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Cyclical DataStream Detected, please change selection");
 
                     var pivotDictionary = Getters.GetPivotDictionary(selectedObjects, xSpacing, ySpacing, Direction);
-                    
+                    //PrintDictionary(pivotDictionary);
                     Getters.MoveByPivotDictionary(pivotDictionary);
-                    
+                    //Getters.PrintDictionary(selectedObjects);
                 }
                 else AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Set selection by selecting items on canvas and pressing 'Select'");
-          
+            }
 
         }
 
         private bool rightToLeft = false;
-
+        
         public bool Direction
         {
             get { return rightToLeft; }
@@ -109,7 +128,7 @@ namespace CanvasTools.Components
                 }
             }
         }
-
+        
 
         public override void AppendAdditionalMenuItems(ToolStripDropDown menu)
         {
@@ -124,7 +143,7 @@ namespace CanvasTools.Components
             RecordUndoEvent("Direction");
             //if Direction is true, turn to false and if false, turn to true.
             Direction = !Direction;
-            ExpireSolution(true);
+            ExpireSolution(true);            
         }
         public override bool Write(GH_IWriter writer)
         {
@@ -149,13 +168,6 @@ namespace CanvasTools.Components
         /// It is vital this Guid doesn't change otherwise old ghx files 
         /// that use the old ID will partially fail during loading.
         /// </summary>
-
-        /// <summary>
-        /// Gets the unique ID for this component. Do not change this ID after release.
-        /// </summary>
-        public override Guid ComponentGuid
-        {
-            get { return new Guid("BBFB90C9-32A2-4683-96BF-A9C12E73003E"); }
-        }
+        public override Guid ComponentGuid => new Guid("ad3763d6-4140-4138-afb6-6a2620ecc251");
     }
 }
